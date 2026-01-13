@@ -46,9 +46,10 @@ var (
 		"filesetname":    "FilesetName",
 	}
 	quotaTypeMap = map[string]rune{
-		"user":    'u',
-		"group":   'g',
-		"fileset": 'j',
+		"user":        'u',
+		"numericuser": 'n',
+		"group":       'g',
+		"fileset":     'j',
 	}
 	mmrepquotaExec = mmrepquota
 )
@@ -282,6 +283,10 @@ func (c *MmrepquotaCollector) collect(typeArg string) ([]QuotaMetric, error) {
 
 func mmrepquota(ctx context.Context, typeArg string) (string, error) {
 	args := []string{"/usr/lpp/mmfs/bin/mmrepquota", typeArg, "-Y"}
+	if typeArg == "-n" {
+		// this was asking for a  numeric user lookup, so we need to state we want users
+		args = append(args, "-u")
+	}
 
 	if *configMmrepquotaFilesystems == "" {
 		args = append(args, "-a")
